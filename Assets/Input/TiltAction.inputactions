@@ -1,0 +1,34 @@
+{
+    "name": "TiltAction",
+    "maps": [
+        {
+            "name": "Fish",
+            "id": "546f019a-499b-4ac9-84b1-b914af09264f",
+            "actions": [
+                {
+                    "name": "Tilt",
+                    "type": "Value",
+                    "id": "210ff7dc-7c3c-49dc-a930-9c5a21903024",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "932d1341-6983-472e-ba47-04092f6a11f3",
+                    "path": "<Accelerometer>/acceleration",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tilt",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
