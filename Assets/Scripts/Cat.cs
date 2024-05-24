@@ -3,15 +3,17 @@ using UnityEngine;
 
 public class Cat : MonoBehaviour
 {
-    private Animator animator;
+    internal Animator animator;
     private Rigidbody2D rb;
-    private Vector2 direction;
+    internal Vector2 direction;
 
     private float moveSpeed = 1.0f;
     private float decisionTimeMin = 10f;  
     private float decisionTimeMax = 20f; 
+    private float nexMoveWait = 1f;
 
-    private bool isMoving = false;
+    internal bool isMoving = false;
+    
 
     void Start()
     {
@@ -22,7 +24,7 @@ public class Cat : MonoBehaviour
         StartCoroutine(MoveCatRoutine());
     }
 
-    IEnumerator MoveCatRoutine()
+    internal IEnumerator MoveCatRoutine()
     {
         while (true)
         {
@@ -36,11 +38,11 @@ public class Cat : MonoBehaviour
             direction = Vector2.zero;
             isMoving = false;
             UpdateAnimatorParameters(); // Update animator when stopping
-            yield return new WaitForSeconds(1f); // Pause for a moment before next move
+            yield return new WaitForSeconds(nexMoveWait); // Pause for a moment before next move
         }
     }
 
-    void SetNewTargetDirection()
+    internal void SetNewTargetDirection()
     {
         // Randomly choose a direction: 0 = up, 1 = down, 2 = left, 3 = right
         int randomDirection = Random.Range(0, 4);
@@ -73,7 +75,7 @@ public class Cat : MonoBehaviour
         }
     }
 
-    void MoveCat()
+    internal void MoveCat()
     {
         // Move the cat in the current direction
         rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
@@ -101,10 +103,12 @@ public class Cat : MonoBehaviour
         StartCoroutine(MoveCatRoutine()); // Restart the movement coroutine
     }
 
-    void UpdateAnimatorParameters()
+    internal void UpdateAnimatorParameters()
     {
         animator.SetFloat("MoveX", direction.x);
         animator.SetFloat("MoveY", direction.y);
         animator.SetBool("IsMoving", isMoving);
+        
     }
+
 }

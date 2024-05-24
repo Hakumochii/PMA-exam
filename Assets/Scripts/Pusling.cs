@@ -1,52 +1,71 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Pusling : Cat
 {
-    private InputAction petAction;
+    private bool isTouching = false;
     private Collider2D puslingCollider;
+    private bool isPet = false;
+    private float petTime = 10f;
+    private bool timerSet = false;
 
     void Awake()
     {
-        // Create a new action map
-        var actionMap = new InputActionMap();
-
-        // Add a new action to the action map
-        petAction = actionMap.AddAction("Pet", binding: "<Touchscreen>/primaryTouch/position");
-
-        // Enable the action map
-        actionMap.Enable();
-
-        // Subscribe to the action's performed event
-        petAction.performed += OnPetPerformed;
-
-        // Get reference to the collider attached to the Pusling
         puslingCollider = GetComponent<Collider2D>();
     }
 
-    void OnDestroy()
+    void Update()
     {
-        // Disable the action map
-        petAction?.actionMap?.Disable();
-
-        // Unsubscribe from the action's performed event
-        petAction.performed -= OnPetPerformed;
+        if (isMoving)
+        {
+            MoveCat();
+        } 
+        
+        // Check for touch input
+        if (Touchscreen.current.primaryTouch.isInProgress)
+        {
+            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+            
+            // Check if touch starts over Pusling
+            if (!isTouching && puslingCollider.OverlapPoint(touchWorldPosition))
+            {
+                isTouching = true;
+                LayDown();
+                Debug.Log("Pusling is being pet!");
+            }
+        }
+        else
+        {
+            // Check if touch ends
+            if (isTouching)
+            {
+                isTouching = false;
+                Debug.Log("Timer is set!");
+                timerSet = true;
+                StartCoroutine(GetUp());
+            }
+        }
     }
 
-    private void OnPetPerformed(InputAction.CallbackContext context)
+    void LayDown()
     {
-        // Get the touch position from the context
-        Vector2 touchPosition = context.ReadValue<Vector2>();
+        direction = Vector2.zero;
+        isPet = true;
+        isMoving = false;
+        animator.SetBool("IsPet", isPet);
+        UpdateAnimatorParameters();
+        StopCoroutine(MoveCatRoutine());
+    }
 
-        // Convert touch position to world space
-        Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
-
-        // Check if the touch position overlaps with the Pusling's collider
-        if (puslingCollider != null && puslingCollider.OverlapPoint(touchWorldPosition))
-        {
-            // Handle the touch interaction
-            Debug.Log("Pusling was touched!");
-            // You can add your own logic here, such as triggering an animation or sound
-        }
+    IEnumerator GetUp()
+    {
+        yield return new WaitForSeconds(petTime);
+        Debug.Log("Pusling is standing!");
+        timerSet = false;
+        isPet = false;
+        animator.SetBool("IsPet", isPet);
+        StartCoroutine(MoveCatRoutine());
     }
 }
