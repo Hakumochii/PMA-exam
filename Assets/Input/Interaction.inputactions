@@ -1,5 +1,5 @@
 {
-    "name": "TiltAction",
+    "name": "Interaction",
     "maps": [
         {
             "name": "Fish",
@@ -24,6 +24,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "Tilt",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "PuslingInt",
+            "id": "26677280-a85e-43e4-a032-b70c01ee4777",
+            "actions": [
+                {
+                    "name": "Pet",
+                    "type": "PassThrough",
+                    "id": "c01a50d7-2ebc-49f4-8a7f-95e55b923cdd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f05c317e-c4ae-48f1-8a71-927eb3bf560b",
+                    "path": "<Touchscreen>/primaryTouch",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pet",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -8,11 +8,10 @@ public class Cat : MonoBehaviour
     private Vector2 direction;
 
     private float moveSpeed = 1.0f;
-    private float decisionTimeMin = 2f;  
-    private float decisionTimeMax = 5f; 
+    private float decisionTimeMin = 10f;  
+    private float decisionTimeMax = 20f; 
 
     private bool isMoving = false;
-    
 
     void Start()
     {
@@ -36,6 +35,7 @@ public class Cat : MonoBehaviour
             // Stop moving
             direction = Vector2.zero;
             isMoving = false;
+            UpdateAnimatorParameters(); // Update animator when stopping
             yield return new WaitForSeconds(1f); // Pause for a moment before next move
         }
     }
@@ -62,6 +62,7 @@ public class Cat : MonoBehaviour
         }
 
         isMoving = true;
+        UpdateAnimatorParameters(); // Update animator when starting to move
     }
 
     void Update()
@@ -70,11 +71,6 @@ public class Cat : MonoBehaviour
         {
             MoveCat();
         }
-
-        // Update the animator parameters to reflect movement direction
-        animator.SetFloat("MoveX", direction.x);
-        animator.SetFloat("MoveY", direction.y);
-        animator.SetBool("IsMoving", isMoving);
     }
 
     void MoveCat()
@@ -87,7 +83,28 @@ public class Cat : MonoBehaviour
     {
         if (collision.gameObject.tag == "wall")
         {
-            SetNewTargetDirection();
+            // Stop all movement and reset direction
+            direction = Vector2.zero;
+            isMoving = false;
+            UpdateAnimatorParameters(); // Update animator immediately on collision
+            
+            // Stop the current movement coroutine and start a new direction change routine
+            StopCoroutine(MoveCatRoutine());
+            StartCoroutine(WaitAndChangeDirection());
         }
+    }
+
+    IEnumerator WaitAndChangeDirection()
+    {
+        yield return new WaitForSeconds(0.1f); // Small delay before changing direction
+        SetNewTargetDirection();
+        StartCoroutine(MoveCatRoutine()); // Restart the movement coroutine
+    }
+
+    void UpdateAnimatorParameters()
+    {
+        animator.SetFloat("MoveX", direction.x);
+        animator.SetFloat("MoveY", direction.y);
+        animator.SetBool("IsMoving", isMoving);
     }
 }
