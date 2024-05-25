@@ -15,7 +15,7 @@ public class TouchCat : Cat
     }
 
 
-    void Update()
+    protected virtual void Update()
     {
         if (isMoving)
         {

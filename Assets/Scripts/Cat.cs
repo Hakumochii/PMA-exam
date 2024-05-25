@@ -11,7 +11,7 @@ public class Cat : MonoBehaviour
     private float moveSpeed = 1.0f;
     private float decisionTimeMin = 10f;  
     private float decisionTimeMax = 20f; 
-    private float nexMoveWait = 1f;
+    internal float nexMoveWait = 2f;
 
     internal bool isMoving = false;
     internal bool routine = true;
@@ -82,28 +82,6 @@ public class Cat : MonoBehaviour
     {
         // Move the cat in the current direction
         rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
-    }
-
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "wall")
-        {
-            // Stop all movement and reset direction
-            direction = Vector2.zero;
-            isMoving = false;
-            UpdateAnimatorParameters(); // Update animator immediately on collision
-            
-            // Stop the current movement coroutine and start a new direction change routine
-            StopCoroutine(MoveCatRoutine());
-            StartCoroutine(WaitAndChangeDirection());
-        }
-    }
-
-    IEnumerator WaitAndChangeDirection()
-    {
-        yield return new WaitForSeconds(0.1f); // Small delay before changing direction
-        SetNewTargetDirection();
-        StartCoroutine(MoveCatRoutine()); // Restart the movement coroutine
     }
 
     internal void UpdateAnimatorParameters()
