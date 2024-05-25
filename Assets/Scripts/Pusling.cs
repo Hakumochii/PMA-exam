@@ -1,62 +1,48 @@
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class Pusling : Cat
+public class Pusling : TouchCat
 {
-    private bool isTouching = false;
-    private Collider2D puslingCollider;
     private bool isPet = false;
     private float petTime = 10f;
     private bool timerSet = false;
 
-    void Awake()
+    protected override void TouchStart()
     {
-        puslingCollider = GetComponent<Collider2D>();
+        Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+        Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+            
+        // Check if touch starts over pusling
+        if (!isTouching && catCollider.OverlapPoint(touchWorldPosition))
+        {
+            isTouching = true;
+            LayDown();
+            Debug.Log("Pusling is being pet!");
+        }
     }
 
-    void Update()
+    protected override void TouchEnd()
     {
-        if (isMoving)
+        // Check if touch ends
+        if (isTouching)
         {
-            MoveCat();
-        } 
-        
-        // Check for touch input
-        if (Touchscreen.current.primaryTouch.isInProgress)
-        {
-            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-            Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
-            
-            // Check if touch starts over Pusling
-            if (!isTouching && puslingCollider.OverlapPoint(touchWorldPosition))
-            {
-                isTouching = true;
-                LayDown();
-                Debug.Log("Pusling is being pet!");
-            }
-        }
-        else
-        {
-            // Check if touch ends
-            if (isTouching)
-            {
-                isTouching = false;
-                Debug.Log("Timer is set!");
-                timerSet = true;
-                StartCoroutine(GetUp());
-            }
+            isTouching = false;
+            Debug.Log("Timer is set!");
+            timerSet = true;
+            StartCoroutine(GetUp());
         }
     }
 
     void LayDown()
     {
         direction = Vector2.zero;
+        routine = false;
         isPet = true;
         isMoving = false;
         animator.SetBool("IsPet", isPet);
         UpdateAnimatorParameters();
-        StopCoroutine(MoveCatRoutine());
     }
 
     IEnumerator GetUp()
@@ -66,6 +52,7 @@ public class Pusling : Cat
         timerSet = false;
         isPet = false;
         animator.SetBool("IsPet", isPet);
-        StartCoroutine(MoveCatRoutine());
+        routine = true;
     }
+
 }

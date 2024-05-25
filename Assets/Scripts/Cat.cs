@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class Cat : MonoBehaviour
     private float nexMoveWait = 1f;
 
     internal bool isMoving = false;
+    internal bool routine = true;
     
 
     void Start()
@@ -26,7 +28,7 @@ public class Cat : MonoBehaviour
 
     internal IEnumerator MoveCatRoutine()
     {
-        while (true)
+        while (routine == true)
         {
             SetNewTargetDirection();
 
@@ -44,6 +46,7 @@ public class Cat : MonoBehaviour
 
     internal void SetNewTargetDirection()
     {
+        
         // Randomly choose a direction: 0 = up, 1 = down, 2 = left, 3 = right
         int randomDirection = Random.Range(0, 4);
 

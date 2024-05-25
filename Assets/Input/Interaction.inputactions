@@ -30,11 +30,11 @@
             ]
         },
         {
-            "name": "PuslingInt",
+            "name": "Cat",
             "id": "26677280-a85e-43e4-a032-b70c01ee4777",
             "actions": [
                 {
-                    "name": "Pet",
+                    "name": "TouchPress",
                     "type": "PassThrough",
                     "id": "c01a50d7-2ebc-49f4-8a7f-95e55b923cdd",
                     "expectedControlType": "",
@@ -51,7 +51,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Pet",
+                    "action": "TouchPress",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
