@@ -5,7 +5,7 @@ using UnityEngine;
 public class Cat : MonoBehaviour
 {
     internal Animator animator;
-    private Rigidbody2D rb;
+    internal Rigidbody2D rb;
     internal Vector2 direction;
 
     private float moveSpeed = 1.0f;
@@ -70,7 +70,7 @@ public class Cat : MonoBehaviour
         UpdateAnimatorParameters(); // Update animator when starting to move
     }
 
-    void Update()
+    internal void Update()
     {
         if (isMoving)
         {
