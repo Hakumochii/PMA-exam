@@ -9,11 +9,6 @@ public class Musling : TouchCat
 
     protected override void Update()
     {
-        if (isMoving)
-        {
-            MoveCat();
-        } 
-
         // Check for touch input
         if (Touchscreen.current.primaryTouch.isInProgress)
         {

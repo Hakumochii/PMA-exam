@@ -11,16 +11,18 @@ public class Cat : MonoBehaviour
     private float moveSpeed = 1.0f;
     private float decisionTimeMin = 10f;  
     private float decisionTimeMax = 20f; 
-    internal float nexMoveWait = 2f;
+    internal float nextMoveWait = 2f;
 
     internal bool isMoving = false;
     internal bool routine = true;
+    private SpriteRenderer spriteRenderer;
     
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>(); 
 
         // Start the movement coroutine
         StartCoroutine(MoveCatRoutine());
@@ -40,7 +42,7 @@ public class Cat : MonoBehaviour
             direction = Vector2.zero;
             isMoving = false;
             UpdateAnimatorParameters(); // Update animator when stopping
-            yield return new WaitForSeconds(nexMoveWait); // Pause for a moment before next move
+            yield return new WaitForSeconds(nextMoveWait); // Pause for a moment before next move
         }
     }
 
@@ -76,6 +78,7 @@ public class Cat : MonoBehaviour
         {
             MoveCat();
         }
+
     }
 
     internal void MoveCat()
@@ -90,6 +93,21 @@ public class Cat : MonoBehaviour
         animator.SetFloat("MoveY", direction.y);
         animator.SetBool("IsMoving", isMoving);
         
+    }
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+       
+        if (collision.gameObject.CompareTag("wall"))
+        {
+            Debug.Log("collided with wall");
+            // Stop moving when colliding with walls
+            direction = Vector2.zero;
+            isMoving = false;
+            UpdateAnimatorParameters(); // Update animator when stopping
+        }
+
     }
 
 }

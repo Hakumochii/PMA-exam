@@ -133,7 +133,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishPrefab: {fileID: 4437779914916347952}
-  fishMoving: 0
 --- !u!50 &4363271138327576860
 Rigidbody2D:
   serializedVersion: 4

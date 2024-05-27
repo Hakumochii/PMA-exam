@@ -7,7 +7,6 @@ public class Misling : Cat
     private Transform fishTransform; // Reference to the fish's transform
     private float chaseSpeed = 3f; // Speed at which Misling chases the fish
     private GameObject fishGameObject; // Reference to the fish's GameObject
-    private Fish fishScript;
     private float reachedFishPosOffset = 5;
     private float playingFishDis = 7;
     private bool fishIsMoving;
@@ -38,7 +37,6 @@ public class Misling : Cat
         if (fishGameObject != null)
         {
             fishTransform = fishGameObject.transform;
-            fishScript = fishGameObject.GetComponent<Fish>();
         }
         else
         {
@@ -48,7 +46,7 @@ public class Misling : Cat
 
     void Update()
     {
-        fishIsMoving = fishScript.fishMoving;
+        fishIsMoving = FishButton.Instance.FishMoving;
        
         switch (mislingState)
         {
@@ -66,7 +64,7 @@ public class Misling : Cat
 
     void Patrol()
     {
-        if (fishScript != null && fishIsMoving)
+        if (fishIsMoving)
         {
             // If the fish is moving, start chasing it
             mislingState = MislingState.ChasingFish;
@@ -81,7 +79,7 @@ public class Misling : Cat
 
     void ChaseFish()
     {
-        if (fishScript != null && fishIsMoving)
+        if (fishIsMoving)
         {
             if (fishTransform != null)
             {
@@ -114,7 +112,7 @@ public class Misling : Cat
 
     void ReachedFish()
     {
-        if (fishScript != null && fishIsMoving)
+        if (fishIsMoving)
         {
             // Perform actions when Misling reaches the fish
             direction = Vector2.zero;

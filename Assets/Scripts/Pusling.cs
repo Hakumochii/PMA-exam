@@ -85,7 +85,7 @@ public class Pusling : TouchCat
         isPet = false;
         animator.SetBool("IsPet", isPet);
         routine = true;
-        yield return new WaitForSeconds(nexMoveWait);
+        yield return new WaitForSeconds(nextMoveWait);
         isMoving = true;
         UpdateAnimatorParameters();
 
