@@ -8,68 +8,56 @@ public class Cat : MonoBehaviour
     internal Rigidbody2D rb;
     internal Vector2 direction;
 
-    private float moveSpeed = 1.0f;
-    private float decisionTimeMin = 10f;  
-    private float decisionTimeMax = 20f; 
+    private float moveSpeed = 0.5f;
+    private float moveTimeMin = 10f;  
+    private float moveTimeMax = 20f; 
     internal float nextMoveWait = 2f;
 
     internal bool isMoving = false;
     internal bool routine = true;
-    private SpriteRenderer spriteRenderer;
-    
 
+    private Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+    
+    
     void Start()
     {
+        // Get components
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>(); 
 
-        // Start the movement coroutine
+        // Start cat partolling
         StartCoroutine(MoveCatRoutine());
     }
 
     internal IEnumerator MoveCatRoutine()
     {
-        while (routine == true)
+        while (routine)
         {
+            // Get a direction to move in
             SetNewTargetDirection();
 
             // Move for a random duration within the range
-            float moveDuration = Random.Range(decisionTimeMin, decisionTimeMax);
+            float moveDuration = Random.Range(moveTimeMin, moveTimeMax);
             yield return new WaitForSeconds(moveDuration);
 
             // Stop moving
-            direction = Vector2.zero;
             isMoving = false;
-            UpdateAnimatorParameters(); // Update animator when stopping
-            yield return new WaitForSeconds(nextMoveWait); // Pause for a moment before next move
+            direction = Vector2.zero;
+            UpdateAnimatorParameters();
+            yield return new WaitForSeconds(nextMoveWait); 
         }
     }
 
     internal void SetNewTargetDirection()
     {
         
-        // Randomly choose a direction: 0 = up, 1 = down, 2 = left, 3 = right
-        int randomDirection = Random.Range(0, 4);
+        // Randomly choose a direction
+        int randomIndex = Random.Range(0, directions.Length);
+        direction = directions[randomIndex];
 
-        switch (randomDirection)
-        {
-            case 0:
-                direction = Vector2.up;
-                break;
-            case 1:
-                direction = Vector2.down;
-                break;
-            case 2:
-                direction = Vector2.left;
-                break;
-            case 3:
-                direction = Vector2.right;
-                break;
-        }
-
+        // Update animator when starting to move
         isMoving = true;
-        UpdateAnimatorParameters(); // Update animator when starting to move
+        UpdateAnimatorParameters(); 
     }
 
     internal void Update()
@@ -96,16 +84,15 @@ public class Cat : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
        
         if (collision.gameObject.CompareTag("wall"))
         {
-            Debug.Log("collided with wall");
             // Stop moving when colliding with walls
-            direction = Vector2.zero;
             isMoving = false;
-            UpdateAnimatorParameters(); // Update animator when stopping
+            direction = Vector2.zero;
+            UpdateAnimatorParameters();
         }
 
     }

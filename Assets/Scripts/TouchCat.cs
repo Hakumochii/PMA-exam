@@ -1,31 +1,34 @@
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
-using System.Collections;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 
 public class TouchCat : Cat
 {
-    internal bool isTouching = false;
     internal Collider2D catCollider;
+    protected Camera mainCamera;
 
     protected virtual void Awake()
     {
         catCollider = GetComponent<Collider2D>();
+        mainCamera = Camera.main;
     }
-
 
     protected virtual void Update()
     {
-        if (isMoving)
-        {
-            MoveCat();
-        } 
+        HandleTouchInput();
+        base.Update();
+    }
 
-        // Check for touch input
+    protected virtual void HandleTouchInput()
+    {
         if (Touchscreen.current.primaryTouch.isInProgress)
         {
-            TouchStart();
+            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            Vector3 touchWorldPosition = mainCamera.ScreenToWorldPoint(touchPosition);
+            
+            if (catCollider.OverlapPoint(touchWorldPosition))
+            {
+                TouchStart();
+            }
         }
         else
         {
@@ -33,24 +36,7 @@ public class TouchCat : Cat
         }
     }
 
-    protected virtual void TouchStart()
-    {
-        Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-        Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
-            
-        // Check if touch starts over cat
-        if (!isTouching && catCollider.OverlapPoint(touchWorldPosition))
-        {
-            isTouching = true;
-        }
-    }
+    protected virtual void TouchStart(){}
 
-    protected virtual void TouchEnd()
-    {
-        // Check if touch ends
-        if (isTouching)
-        {
-            isTouching = false;
-        }
-    }
+    protected virtual void TouchEnd(){}
 }

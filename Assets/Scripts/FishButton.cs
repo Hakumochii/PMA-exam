@@ -3,14 +3,19 @@ using UnityEngine.InputSystem;
 
 public class FishButton : MonoBehaviour
 {
-    private static FishButton _instance;
-    public static FishButton Instance { get { return _instance; } }
-    public GameObject fishPrefab; // Reference to the fish prefab
-    internal bool FishMoving { get; private set; } = false; // Internal property to manage fish movement state
     private Collider2D buttonCollider;
     private GameObject currentFish;
+
     private Vector3 fishPosition = new Vector3(-2.91f, -6.62f, 0.0337346f);
     private Quaternion fishRotation = Quaternion.Euler(0f, 0f, -15.662f);
+
+    [SerializeField] private GameObject fishPrefab; // Reference to the fish prefab
+
+    private static FishButton _instance;
+    public static FishButton Instance { get { return _instance; } }
+    
+    public bool FishMoving { get; private set; } = false; // Internal property to manage fish movement state
+
 
     private void Awake()
     {
@@ -25,9 +30,9 @@ public class FishButton : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
         }
 
-        currentFish = GameObject.FindWithTag("Fish");
-
+        // Define variables
         buttonCollider = GetComponent<Collider2D>();
+        currentFish = GameObject.FindWithTag("Fish");
     }
 
     private void Update()
@@ -44,6 +49,7 @@ public class FishButton : MonoBehaviour
                 ToggleFishMovement();
             }
 
+            // If fish has stopped moving destroy and make a new one (reset fish)
             if (!FishMoving)
             {
                 if (currentFish != null)
@@ -59,6 +65,7 @@ public class FishButton : MonoBehaviour
 
     internal void ToggleFishMovement()
     {
+        // Change fish movement
         FishMoving = !FishMoving;
     }
 

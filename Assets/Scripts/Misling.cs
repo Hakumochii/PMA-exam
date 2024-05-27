@@ -1,17 +1,19 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Misling : Cat
 {
-    private Transform fishTransform; // Reference to the fish's transform
-    private float chaseSpeed = 3f; // Speed at which Misling chases the fish
-    private GameObject fishGameObject; // Reference to the fish's GameObject
-    private float reachedFishPosOffset = 5;
-    private float playingFishDis = 7;
-    private bool fishIsMoving;
+    private Transform fishTransform;
+    private GameObject fishGameObject;
 
-    // Enum to represent Misling's states
+    private float chaseSpeed = 2f;
+    private float reachedFishPosOffset = 5f;
+    private float playingFishDis = 5f;
+
+    private bool fishIsMoving;
+    private float distanceToFish;
+    private Vector3 directionToFish;
+
     private enum MislingState
     {
         Patrolling,
@@ -19,35 +21,27 @@ public class Misling : Cat
         ReachedFish
     }
 
-    private MislingState mislingState = MislingState.Patrolling; // Initialize Misling's state to patrolling
+    private MislingState mislingState = MislingState.Patrolling;
 
-    void Start()
+
+    void FindFish()
     {
-        // Get references to components
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-
-        // Start the movement coroutine
-        StartCoroutine(MoveCatRoutine());
-
-        // Find the fish GameObject by its tag "Fish"
         fishGameObject = GameObject.FindWithTag("Fish");
-
-        // If the fish GameObject is found, get its transform component
-        if (fishGameObject != null)
-        {
-            fishTransform = fishGameObject.transform;
-        }
-        else
-        {
-            Debug.LogError("Fish GameObject not found!");
-        }
+        fishTransform = fishGameObject.transform;
     }
 
     void Update()
     {
+        // If fish dissapears find it again
+        if (fishGameObject == null)
+        {
+            FindFish();
+        }
+
+        // Define variable we use in multiple other states
         fishIsMoving = FishButton.Instance.FishMoving;
-       
+        distanceToFish = Vector2.Distance(rb.position, fishTransform.position);
+
         switch (mislingState)
         {
             case MislingState.Patrolling:
@@ -66,84 +60,80 @@ public class Misling : Cat
     {
         if (fishIsMoving)
         {
-            // If the fish is moving, start chasing it
             mislingState = MislingState.ChasingFish;
         }
         else
         {
-            // If the fish is not moving, Misling roams randomly
             base.Update();
         }
-        
     }
 
     void ChaseFish()
     {
-        if (fishIsMoving)
+        if (!fishIsMoving)
         {
-            if (fishTransform != null)
-            {
-                Vector3 rbPos3D = new Vector3(rb.position.x, rb.position.y, 0f); // Convert rb.position to Vector3
-                Vector3 directionToFish = (fishTransform.position - rbPos3D).normalized;
-
-                // Add an offset for the position of the fish that the cat is chasing
-                Vector3 chasePosition = fishTransform.position - (directionToFish * reachedFishPosOffset);
-
-                // Move towards the chase position
-                rb.MovePosition(rb.position + (Vector2)(chasePosition - rbPos3D).normalized * chaseSpeed * Time.deltaTime);
-
-                // Check if Misling has reached the fish
-                float distanceToFish = Vector2.Distance(rb.position, fishTransform.position);
-                if (distanceToFish < reachedFishPosOffset)
-                {
-                    // Change Misling's state to ReachedFish if it reaches the fish
-                    mislingState = MislingState.ReachedFish;
-                }
-
-                // Update animator parameters based on movement direction
-                UpdateAnimatorParameters(directionToFish);
-            }
+            StartCoroutine(MoveCatRoutine());
+            mislingState = MislingState.Patrolling;
         }
         else
         {
-            mislingState = MislingState.Patrolling;
+            // Find direction of fish based on Misling then move torwards that direction and have the animator react accordingly
+            directionToFish = (fishTransform.position - (Vector3)rb.position).normalized;
+            rb.MovePosition(rb.position + (Vector2)directionToFish * chaseSpeed * Time.deltaTime);
+            UpdateAnimatorParameters(directionToFish);
+
+            // if the distance of the fish is less than a set length/ if Misling is close enough to fish change state to reached fish
+            if (distanceToFish < reachedFishPosOffset)
+            {
+                mislingState = MislingState.ReachedFish;
+            }
         }
     }
 
     void ReachedFish()
     {
-        if (fishIsMoving)
+        if (!fishIsMoving)
         {
-            // Perform actions when Misling reaches the fish
-            direction = Vector2.zero;
+            animator.SetBool("IsPlaying", false);
+            StartCoroutine(MoveCatRoutine());
+            mislingState = MislingState.Patrolling;
+        }
+        else
+        {
+            // stop moving and play "playing" animation
             isMoving = false;
-            animator.SetBool("IsPlaying", true);
+            direction = Vector2.zero;
             UpdateAnimatorParameters();
+            animator.SetBool("IsPlaying", true);
 
-            // Change Misling's state back to Patrolling after reaching the fish
-            float distanceToFish = Vector2.Distance(rb.position, fishTransform.position);
-            
+            // If fish moves a certain distance away form Misling start moving again, stop playing animation and chnge to chasing state
             if (distanceToFish > playingFishDis)
             {
                 isMoving = true;
                 animator.SetBool("IsPlaying", false);
-                UpdateAnimatorParameters();
                 mislingState = MislingState.ChasingFish;
             }
-        }
-        else
-        {
-            animator.SetBool("IsPlaying", false);
-            mislingState = MislingState.Patrolling;
-        }
-        
+        }  
     }
 
-    // Method to update animator parameters based on movement direction
+    // Overload "UpdateAnimatorParameters" to be able to take a perameter so that Mislings animations will act according to its direction while chasing fish 
+    // without interferring with the current direction variable in Cat class
     void UpdateAnimatorParameters(Vector3 movementDirection)
     {
         animator.SetFloat("MoveX", movementDirection.x);
         animator.SetFloat("MoveY", movementDirection.y);
         animator.SetBool("IsMoving", isMoving);
     }
+
+    protected override void OnCollisionEnter2D(Collision2D collision)
+    {
+        // While fish is moving Misling wont stop when bumping into walls
+        if (!fishIsMoving && collision.gameObject.CompareTag("wall"))
+        {
+            isMoving = false;
+            direction = Vector2.zero;
+            UpdateAnimatorParameters();
+        }
+    }
 }
+

@@ -11,31 +11,6 @@ public class Pusling : TouchCat
 
     protected override void TouchStart()
     {
-        Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-        Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
-
-        // Check if touch starts over pusling
-        if (!isTouching && catCollider.OverlapPoint(touchWorldPosition))
-        {
-            isTouching = true;
-            LayDown();
-            Debug.Log("Pusling is being pet!");
-        }
-    }
-
-    protected override void TouchEnd()
-    {
-        // Check if touch ends
-        if (isTouching)
-        {
-            isTouching = false;
-            Debug.Log("Timer is set!");
-            StartGetUpCoroutine();
-        }
-    }
-
-    void LayDown()
-    {
         SoundManager.Instance.PlayPusPet();
         direction = Vector2.zero;
         routine = false;
@@ -46,6 +21,11 @@ public class Pusling : TouchCat
 
         // Cancel any ongoing GetUp coroutine when laying down
         CancelGetUpCoroutine();
+    }
+
+    protected override void TouchEnd()
+    {
+        StartGetUpCoroutine();
     }
 
     private void StartGetUpCoroutine()
