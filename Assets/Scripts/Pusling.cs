@@ -1,75 +1,48 @@
-using System.Collections;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System.Collections;
 
 public class Pusling : TouchCat
 {
     private bool isPet = false;
     private float petTime = 10f;
-    private CancellationTokenSource getUpCancellationTokenSource; // Token source to cancel the coroutine
+    private Coroutine getUpCoroutine;
 
     protected override void TouchStart()
     {
-        SoundManager.Instance.PlayPusPet();
+        // Stop patrol routine and stop moving then play petting animation and sound
         direction = Vector2.zero;
-        routine = false;
-        isPet = true;
         isMoving = false;
-        animator.SetBool("IsPet", isPet);
+        isPet = true;
+        routine = false;
         UpdateAnimatorParameters();
+        animator.SetBool("IsPet", isPet);
+        SoundManager.Instance.PlayPusPet();
 
-        // Cancel any ongoing GetUp coroutine when laying down
-        CancelGetUpCoroutine();
+        if (getUpCoroutine != null)
+        {
+            StopCoroutine(getUpCoroutine);
+            getUpCoroutine = null;
+        }
     }
 
     protected override void TouchEnd()
     {
-        StartGetUpCoroutine();
-    }
-
-    private void StartGetUpCoroutine()
-    {
-        // Cancel any ongoing GetUp coroutine before starting a new one
-        CancelGetUpCoroutine();
-
-        getUpCancellationTokenSource = new CancellationTokenSource();
-        StartCoroutine(GetUp(getUpCancellationTokenSource.Token));
-    }
-
-    private void CancelGetUpCoroutine()
-    {
-        if (getUpCancellationTokenSource != null)
-        {
-            getUpCancellationTokenSource.Cancel();
-            getUpCancellationTokenSource = null;
-        }
-    }
-
-    private IEnumerator GetUp(CancellationToken cancellationToken)
-    {
+        // Stop playing purring sound ans start the GetUp coroutine when touch ends
         SoundManager.Instance.StopPusPet();
-        float elapsedTime = 0f; // Track the elapsed time
-        while (elapsedTime < petTime)
-        {
-            yield return null; // Wait for one frame
-            elapsedTime += Time.deltaTime;
+        getUpCoroutine = StartCoroutine(GetUp());
+    }
 
-            // Check for cancellation
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-        }
+    private IEnumerator GetUp()
+    {
+        yield return new WaitForSeconds(petTime);
 
-        // Only stand up if the full pet time has elapsed
-        Debug.Log("Pusling is standing!");
+        // Only stand up(stop playing petting and start routine again) if the full pet time has elapsed
         isPet = false;
-        animator.SetBool("IsPet", isPet);
-        routine = true;
-        yield return new WaitForSeconds(nextMoveWait);
         isMoving = true;
+        routine = true;
         UpdateAnimatorParameters();
-
-        // Ensure the token source is cleaned up
-        getUpCancellationTokenSource = null;
+        animator.SetBool("IsPet", isPet);
+        StartCoroutine(MoveCatRoutine());
     }
 }

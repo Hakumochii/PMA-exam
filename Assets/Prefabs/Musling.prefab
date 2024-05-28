@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 6480181814020184639}
   m_Layer: 7
   m_Name: Musling
-  m_TagString: Untagged
+  m_TagString: Cat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125,7 +125,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 30
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 2bbd51c2abd56164fa24d52b8b217e2a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

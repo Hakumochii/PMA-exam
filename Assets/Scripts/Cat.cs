@@ -8,10 +8,10 @@ public class Cat : MonoBehaviour
     internal Rigidbody2D rb;
     internal Vector2 direction;
 
-    private float moveSpeed = 0.5f;
+    private float moveSpeed = 1f;
     private float moveTimeMin = 10f;  
     private float moveTimeMax = 20f; 
-    internal float nextMoveWait = 2f;
+    internal float nextMoveWait = 1f;
 
     internal bool isMoving = false;
     internal bool routine = true;
@@ -19,7 +19,7 @@ public class Cat : MonoBehaviour
     private Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
     
     
-    void Start()
+    internal void Start()
     {
         // Get components
         rb = GetComponent<Rigidbody2D>();
@@ -82,7 +82,6 @@ public class Cat : MonoBehaviour
         animator.SetBool("IsMoving", isMoving);
         
     }
-
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {

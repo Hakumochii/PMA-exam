@@ -1,31 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 public class SoundManager : MonoBehaviour
 {
     private static SoundManager instance;
-
-    // Add more fields and properties as needed
-    public AudioSource backgroundMusic;
-    public AudioSource pusPet;
-    public AudioSource musPick;
-
-
-    // Ensure only one instance of SoundManager exists
     public static SoundManager Instance
     {
+        // Ensure there is always an instance of the sound manager
         get
         {
-            if (instance == null)
+            // Check if the instance is null or has been destroyed
+            if (instance == null || instance.gameObject == null)
             {
+                // Find an existing instance in the scene
                 instance = FindObjectOfType<SoundManager>();
 
+                // If no instance exists, create a new one
                 if (instance == null)
                 {
-                    GameObject obj = new GameObject();
-                    obj.name = typeof(SoundManager).Name;
+                    GameObject obj = new GameObject(nameof(SoundManager));
                     instance = obj.AddComponent<SoundManager>();
                 }
             }
@@ -33,21 +25,28 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // Ensure the instance isn't destroyed when loading new scenes
+    [SerializeField] private AudioSource backgroundMusic;
+    [SerializeField] private AudioSource pusPet;
+    [SerializeField] private AudioSource musPick;
+    [SerializeField] private AudioSource misPlay;
+
     private void Awake()
     {
-        if (instance == null)
+        // Ensure the instance isn't destroyed when loading new scenes
+        if (instance == null || instance.gameObject == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (instance != this)
         {
+            // If another instance exists, destroy this one
             Destroy(gameObject);
+            return;
         }
     }
 
-    // Example methods for playing sound effects
+    // Methods for playing audioclips 
     public void PlayBackgroundMusic()
     {
         if (backgroundMusic != null)
@@ -80,6 +79,19 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    
-}
+    public void PlayMisPlay()
+    {
+        if (misPlay != null)
+        {
+            misPlay.Play();
+        }
+    }
 
+    public void StopMisPlay()
+    {
+        if (misPlay != null)
+        {
+            misPlay.Stop();
+        }
+    }
+}

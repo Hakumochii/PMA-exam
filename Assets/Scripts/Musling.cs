@@ -11,7 +11,7 @@ public class Musling : TouchCat
     {
         base.Update();
 
-        // If the object is picked up, update its position to follow the touch
+        // If Musling is picked up, update its position to follow the touch
         if (isPicked)
         {
             Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
@@ -23,18 +23,18 @@ public class Musling : TouchCat
    
     protected override void TouchStart()
     {
+        // Stop all current animation and movement an start new animation and sound
+        SoundManager.Instance.PlayMusPick();
         isPicked = true;
         routine = false;
         isMoving = false;
         animator.SetBool("IsPicked", isPicked);
         UpdateAnimatorParameters();
-        SoundManager.Instance.PlayMusPick();
-
     }
 
     protected override void TouchEnd()
     {
-       
+        // Continue the normal routine
         isPicked = false;
         animator.SetBool("IsPicked", isPicked);
         routine = true;

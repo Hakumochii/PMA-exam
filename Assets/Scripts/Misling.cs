@@ -6,7 +6,7 @@ public class Misling : Cat
     private Transform fishTransform;
     private GameObject fishGameObject;
 
-    private float chaseSpeed = 2f;
+    private float chaseSpeed = 3f;
     private float reachedFishPosOffset = 5f;
     private float playingFishDis = 5f;
 
@@ -24,13 +24,13 @@ public class Misling : Cat
     private MislingState mislingState = MislingState.Patrolling;
 
 
-    void FindFish()
+    private void FindFish()
     {
         fishGameObject = GameObject.FindWithTag("Fish");
         fishTransform = fishGameObject.transform;
     }
 
-    void Update()
+    private void Update()
     {
         // If fish dissapears find it again
         if (fishGameObject == null)
@@ -56,19 +56,21 @@ public class Misling : Cat
         }
     }
 
-    void Patrol()
+    private void Patrol()
     {
         if (fishIsMoving)
         {
+            SoundManager.Instance.PlayMisPlay();
             mislingState = MislingState.ChasingFish;
         }
         else
         {
+            SoundManager.Instance.StopMisPlay();
             base.Update();
         }
     }
 
-    void ChaseFish()
+    private void ChaseFish()
     {
         if (!fishIsMoving)
         {
@@ -78,6 +80,7 @@ public class Misling : Cat
         else
         {
             // Find direction of fish based on Misling then move torwards that direction and have the animator react accordingly
+            isMoving = true;
             directionToFish = (fishTransform.position - (Vector3)rb.position).normalized;
             rb.MovePosition(rb.position + (Vector2)directionToFish * chaseSpeed * Time.deltaTime);
             UpdateAnimatorParameters(directionToFish);
@@ -90,12 +93,12 @@ public class Misling : Cat
         }
     }
 
-    void ReachedFish()
+    private void ReachedFish()
     {
         if (!fishIsMoving)
         {
-            animator.SetBool("IsPlaying", false);
             StartCoroutine(MoveCatRoutine());
+            animator.SetBool("IsPlaying", false);
             mislingState = MislingState.Patrolling;
         }
         else
@@ -118,7 +121,7 @@ public class Misling : Cat
 
     // Overload "UpdateAnimatorParameters" to be able to take a perameter so that Mislings animations will act according to its direction while chasing fish 
     // without interferring with the current direction variable in Cat class
-    void UpdateAnimatorParameters(Vector3 movementDirection)
+    private void UpdateAnimatorParameters(Vector3 movementDirection)
     {
         animator.SetFloat("MoveX", movementDirection.x);
         animator.SetFloat("MoveY", movementDirection.y);
@@ -135,5 +138,6 @@ public class Misling : Cat
             UpdateAnimatorParameters();
         }
     }
+
 }
 
